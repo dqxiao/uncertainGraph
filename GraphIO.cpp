@@ -12,23 +12,20 @@
 #include <sstream>
 #include <iostream>
 #include <stdio.h>
+//#include "Debug.hpp"
 using namespace std;
 
 
 
 UncertainGraph readUncertainGraph(string filepath,char sep){
 //    File format
-//    Each line: u,s, t
+//    Each line: u,s,t
     fstream graphFile(filepath);
     string line;
     string item;
     vector<double> v;
     igraph_vector_t v_graph,e_probs;
     vector<double> edge_prob;
-    
-    
-    
-    
     if(graphFile.is_open()){
         while (getline(graphFile,line)) {
             stringstream ss(line); // for split line
@@ -62,8 +59,6 @@ UncertainGraph readUncertainGraph(string filepath,char sep){
     UncertainGraph pg(nv+1);
     pg.setEdges(&v_graph);
     
-    //double * parray=edge_prob.data();
-    
     cout<<"init edge probs:"<<edge_prob.size()<<endl;
     //igraph_vector_view(&e_probs, parray, edge_prob.size());
     igraph_vector_init(&e_probs,edge_prob.size());
@@ -71,10 +66,11 @@ UncertainGraph readUncertainGraph(string filepath,char sep){
     for(long int i=0;i<edge_prob.size();i++){
         igraph_vector_set(&e_probs,i,edge_prob[i]);
     }
+    
     pg.setEdgeProbs(&e_probs);
     
     
-    cout<<"init uncertain graph from"<<filepath<<"in edges,p format"<<endl;
+    cout<<"init uncertain graph from"<<filepath<<" in edges, p format"<<endl;
     
     igraph_vector_destroy(&v_graph);
     igraph_vector_destroy(&e_probs);
@@ -128,12 +124,42 @@ UncertainGraph readUncertainGraphAdjacency(string filepath,long nv){
 
 
 
-
-void writeDistribution(UncertainGraph g,string filepath){
-    
-    vector<ContinousDistribution> result;
+void writeDistribution(UncertainGraph g,string filePath){
+//  write mean,std for each vertices   
+    vector<DistPrameter> result;
+    ofstream myfile(filePath);
     result=g.degreeDistributions();
+    for(DistPrameter cd: result){
+        myfile<<cd.mean<<","<<cd.stddev<<endl;
+    }
     
-    
-    
+    myfile.close();
 }
+
+
+void writeDistribution(UncertainGraph g,string filePath,double lb){
+    
+    vector<DistPrameter> result;
+    ofstream myfile(filePath);
+    result=g.degreeDistributions();
+    for(DistPrameter cd: result){
+        if(cd.mean>=lb){
+            myfile<<cd.mean<<","<<cd.stddev<<endl;
+        }
+    }
+    
+    myfile.close();
+}
+
+void writeDistribution(UncertainGraph g,string filePath,vector<int> vs){
+    //  write mean,std for each vertices
+    vector<DistPrameter> result;
+    ofstream myfile(filePath);
+    result=g.degreeDistributions(vs);
+    for(DistPrameter cd: result){
+        myfile<<cd.mean<<","<<cd.stddev<<endl;
+    }
+    myfile.close();
+    //done 
+}
+

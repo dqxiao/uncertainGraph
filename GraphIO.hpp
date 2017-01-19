@@ -19,6 +19,8 @@ UncertainGraph readUncertainGraph(string filepath, char sep);
 UncertainGraph readUncertainGraphAdjacency(string filepath,long nv);
 
 void writeDistribution(UncertainGraph g,string filepath);
+void writeDistribution(UncertainGraph g,string filepath,vector<int> vs);
+void writeDistribution(UncertainGraph g,string filepath,double lb);
 
 
 #endif /* GraphIO_hpp */
