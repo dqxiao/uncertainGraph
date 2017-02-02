@@ -34,4 +34,6 @@ private:
 void writeToFile(string filePath,vector<DistPrameter>&vs, SCCluster sc);
 
 
+
+
 #endif /* SCCluster_hpp */

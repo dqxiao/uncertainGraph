@@ -163,3 +163,7 @@ void writeDistribution(UncertainGraph g,string filePath,vector<int> vs){
     //done 
 }
 
+// done
+
+
+

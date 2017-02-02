@@ -14,7 +14,7 @@ using namespace std;
 
 int buildSimilarityMatrix(fmat data, fmat& S)
 {
-    int Nc = data.n_rows;
+    int Nc = (int)data.n_rows;
     
     for(int i = 0;i<Nc;i++)
     {

@@ -14,7 +14,10 @@
 #include <iostream>
 #include "Debug.hpp"
 #include <vector>
+#include <armadillo>
+#include <string>
 using namespace std;
+using namespace arma;
 
 class UncertainGraph{
 public:
@@ -38,11 +41,27 @@ public:
     void approxVertexSim(vector<double>& vs,vector<double>&result); // using sampling to calculate in the sample way
     vector<DistPrameter> degreeDistributions(double lb);
     void anonymityCheck(UncertainGraph obGraph, int k, double * r); // check whether the obfuscated graph provide enough privacy level
-
-private:
-    vector<double> gdd;
-
+    void vertexCommon(vector<double> & vs_comm, int upper,double & vc_sum); //Need implement one simple idea to estimate the node's density
+    void approximateUniquness(vector<double> & vs_uniq, int k, int scaleUpper); // done
     
+    void obfuscation(string obfMethod);
+    void setPrivacyConstraint(int k, float tolerance);  // set the desirable privacy level
+    void configuration(bool g_sc, bool opt);            // configuration
+    void setColdStart(float sizeMutipler, float sigma, int nAttempt); // done
+    void genObfuscation(double & robf); // genObfuscation based on your configuration
+    void excludingNodes(vector<double> & vProbs); // function used to excluded the largests values
+    
+private:
+    vector<double> gdd; // global degree distribution
+    int k;  // obfuscation level
+    float tolerance; // tolerance level
+    bool g_sc; // used graph size constraint clustering
+    bool opt;  // used randomized method for searching the approximate optimal edge modification
+    float c;   // sizeMultipler
+    float sigma; // sigma
+    int t;        // the number of attempt
+    vector<double> vs_uniq;
+    vector<double> vProbs;
 };
 
 

@@ -10,6 +10,7 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <fstream>
 #include <boost/math/distributions/normal.hpp>
 using boost::math::normal;
 using boost::math::iround;
@@ -119,7 +120,35 @@ double DistPrameter::distance(DistPrameter o, string func){
 }
 
 
-//done
+double DistPrameter::similiarity(DistPrameter o){
+    int th=probMaxVal();
+    int tl=probMinVal();
+    
+    int oh=o.probMaxVal();
+    int ol=o.probMinVal();
+    
+    int l=max(tl,ol);
+    int h=min(th,oh);
+    double result=0;
+    if(h>=l){
+        vector<double> tR;
+        vector<double> oR;
+        for(int i=l;i<=h;i++){
+            result+=o.PDF(i)*PDF(i);
+        }
+    }
+    return result;
+}
+
+double DistPrameter::similiarityNormal(DistPrameter o){
+    double n_mean=mean-o.mean;
+    double n_std=sqrt(pow(stddev,2)+pow(o.stddev,2));
+    DistPrameter n(n_mean,n_std);
+    return n.PDF(0);
+}
+
+
+
 double DistPrameter::getVariance(){
     return pow(stddev,2);
 }
@@ -155,6 +184,79 @@ void ExactDist::degreeDistribution(vector<double> & result){
     }
     
     result=r;
+}
+
+
+double entropy(double p){
+    if(p==0){
+        return 0;
+    }
+    
+    return -p*log2(p);
+}
+
+// read dist parameter from file --just for debugging
+void readDistParameter(string filepath, vector<DistPrameter> &vs){
+    
+    fstream distFile(filepath);
+    string line;
+    string item;
+    vector<double> v;
+    if(distFile.is_open()){
+        while (getline(distFile,line)) {
+            stringstream ss(line); // for split line
+            int i=0;
+            double mean;
+            double std;
+            while(getline(ss,item,'\t')){
+                if(i==0){
+                    mean=stof(item);
+                }
+                if(i==1){
+                    std=stof(item);
+                }
+                i+=1;
+            }
+            vs.push_back(DistPrameter(mean, std));
+        }
+        
+        
+        distFile.close();
+    }else{
+        cout<<"can't find/open"<<filepath<<endl;
+    }
+    
+}
+
+//
+void test_fast_discreteDistribution(const std::vector<double>& weights, const size_t num_samples){
+    std::default_random_engine generator;
+    fast_discrete_distribution<int> distribution(weights);
+    distribution.PrintBuckets();
+    
+    std::vector<size_t> counts(weights.size(), 0);
+    for (size_t i = 0; i < num_samples; ++i) {
+        const int number = distribution(generator);
+        assert(number >= 0);
+        assert(number < static_cast<int>(weights.size()));
+        ++counts[number];
+    }
+    
+    std::cout << "counts:" << std::endl;
+    for (size_t i = 0; i < weights.size(); ++i)
+        cout << i << " (" << weights[i] << ") : "
+        << std::string(counts[i], '*') << endl;
+    
+    cout << endl;
+
+}
+
+void writeUniquess(string filePath,vector<double> vs_uniq){
+    ofstream myfile(filePath);
+    for(double u: vs_uniq){
+        myfile<<u<<endl;
+    }
+    myfile.close();
 }
 
 
